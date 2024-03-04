@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Favorite Twitter Searches</string>
+    <string name="tag_your_query">Tag your query</string>
+    <string name="save">Save</string>
+    <string name="clear_tags">Clear Tags</string>
+    <string name="tagged_searches">Tagged Searches</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="enter_tag">Enter Tag</string>
+    <string name="edit">Edit</string>
+    <string name="edit_tag_text">Edit Tag Text</string>
+</resources>

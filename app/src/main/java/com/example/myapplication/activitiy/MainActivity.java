@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -39,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     List<Tag> tags = new ArrayList<>();
     private float DENSITY = -1;
 
+    /**
+     * On save callback when saving new tags.
+     *
+     * @param view the view
+     */
     public void onSaveButton(View view) {
         TextInputEditText textInputEditText = findViewById(R.id.new_tag_text);
         String tagText = Objects.requireNonNull(textInputEditText.getText()).toString();
@@ -52,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         scrollLayout.addView(createTag(tagText), 1);
     }
 
+    /**
+     * Callback when clearing all tags.
+     *
+     * @param view the view
+     */
     public void onClearTags(View view) {
         LinearLayout scrollLayout = findViewById(R.id.scrollLayout);
         tags.forEach(tag -> scrollLayout.removeView(findViewById(tag.getId())));
@@ -88,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 String searchTextLowerCase = searchText.toLowerCase();
 
                 for (Tag tag : tags) {
-                    int visible = tag.getLabel().toLowerCase().contains(searchTextLowerCase) ? View.VISIBLE : View.GONE;
+                    int visible = tag.getName().toLowerCase().contains(searchTextLowerCase) ? View.VISIBLE : View.GONE;
                     findViewById(tag.getId()).setVisibility(visible);
                 }
 

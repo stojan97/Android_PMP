@@ -10,7 +10,7 @@ public final class DimensionConvertor {
      * DP to pixel convertor.
      *
      * @param density the density
-     * @param dp the dp value
+     * @param dp      the dp value
      * @return the converted pixel value
      */
     public static int dpToPixel(float density, int dp) {

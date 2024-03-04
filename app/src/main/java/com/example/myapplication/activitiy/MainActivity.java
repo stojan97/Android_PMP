@@ -19,14 +19,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.R;
 import com.example.myapplication.dto.Tag;
+import com.example.myapplication.utils.DimensionConvertor;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import com.example.myapplication.utils.DimensionConvertor;
 
 
 /**
@@ -35,7 +34,9 @@ import com.example.myapplication.utils.DimensionConvertor;
 public class MainActivity extends AppCompatActivity {
 
     private static final String EMPTY_TEXT = "";
+
     List<Tag> tags = new ArrayList<>();
+
     private float DENSITY = -1;
 
     /**
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         initListeners();
         initScrollLayout();
     }

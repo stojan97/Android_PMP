@@ -1,7 +1,7 @@
 # Android Project for PMP
 
 ## Video
-[Android Video](attachments/2024-03-21%2012-04-05.mp4)
+https://github.com/stojan97/Android_PMP/assets/10180981/07970010-35de-49dc-a3c4-ffd1784f4c9e
 
 ## Functionality
 

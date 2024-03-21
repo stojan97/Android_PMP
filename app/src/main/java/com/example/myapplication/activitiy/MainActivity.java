@@ -3,12 +3,16 @@ package com.example.myapplication.activitiy;
 import android.app.Dialog;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,14 +22,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.R;
-import com.example.myapplication.dto.Tag;
+import com.example.myapplication.dto.Translation;
+import com.example.myapplication.service.DictionaryService;
+import com.example.myapplication.service.impl.DictionaryServiceImpl;
 import com.example.myapplication.utils.DimensionConvertor;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.button.MaterialButton;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -33,59 +36,75 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private static final String EMPTY_TEXT = "";
+    private static final String TAG = "MainActivity";
 
-    List<Tag> tags = new ArrayList<>();
+    private List<Translation> translations;
 
-    private float DENSITY = -1;
+    private Language language;
 
-    /**
-     * On save callback when saving new tags.
-     *
-     * @param view the view
-     */
-    public void onSaveButton(View view) {
-        TextInputEditText textInputEditText = findViewById(R.id.new_tag_text);
-        String tagText = Objects.requireNonNull(textInputEditText.getText()).toString();
+    private final DictionaryService dictionaryService;
 
-        if (tagText.isEmpty()) {
-            return;
-        }
-
-        LinearLayout scrollLayout = findViewById(R.id.scrollLayout);
-        textInputEditText.setText(EMPTY_TEXT);
-        scrollLayout.addView(createTag(tagText), 1);
-    }
-
-    /**
-     * Callback when clearing all tags.
-     *
-     * @param view the view
-     */
-    public void onClearTags(View view) {
-        LinearLayout scrollLayout = findViewById(R.id.scrollLayout);
-        tags.forEach(tag -> scrollLayout.removeView(findViewById(tag.getId())));
-        tags = new ArrayList<>();
+    public MainActivity() {
+        this.dictionaryService = new DictionaryServiceImpl();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DENSITY = super.getResources().getDisplayMetrics().density;
+
+        Log.d(TAG, "MainActivity created");
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(super.findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        initListeners();
-        initScrollLayout();
+        translations = dictionaryService.getDictionaryTranslations();
+        language = Language.ENGLISH;
+
+        initCallbacks();
+        initTranslations();
     }
 
-    private void initListeners() {
-        SearchView searchView = super.findViewById(R.id.searchView);
+    /**
+     * When language is switched we should operate on the GUI with the selected language.
+     *
+     * @param view the view
+     */
+    public void onLanguageSwitch(View view) {
+        language = language == Language.ENGLISH ? Language.MACEDONIAN : Language.ENGLISH;
+
+        // swap languages
+        TextView firstLanguage = findViewById(R.id.textView2);
+        TextView secondLanguage = findViewById(R.id.textView3);
+        int englishLang = R.string.english_lang;
+        int macedonianLang = R.string.macedonian_lang;
+        firstLanguage.setText(language == Language.ENGLISH ? englishLang : macedonianLang);
+        secondLanguage.setText(language == Language.ENGLISH ? macedonianLang : englishLang);
+
+        // swap buttons
+        translations.forEach(this::swapButtonText);
+    }
+
+    private void swapButtonText(Translation translation) {
+
+        LinearLayout wordLayout = findViewById(translation.getId());
+        Button firstButton = (Button) wordLayout.getChildAt(0);
+        Button secondButton = (Button) wordLayout.getChildAt(1);
+
+        firstButton.setText(translation.getTranslationForLanguage(language));
+        secondButton.setText(translation.getInverseTranslationForLanguage(language));
+    }
+
+    private void initCallbacks() {
+
+        Button addNewTranslationButton = findViewById(R.id.addNewTranslation);
+        addNewTranslationButton.setOnClickListener(view -> displayAddWordCallback());
+
+        SearchView searchView = findViewById(R.id.searchView);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -98,9 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
                 String searchTextLowerCase = searchText.toLowerCase();
 
-                for (Tag tag : tags) {
-                    int visible = tag.getName().toLowerCase().contains(searchTextLowerCase) ? View.VISIBLE : View.GONE;
-                    findViewById(tag.getId()).setVisibility(visible);
+                for (Translation translation : translations) {
+                    String languageTranslation = translation.getTranslationForLanguage(language);
+                    int visible = languageTranslation.toLowerCase().contains(searchTextLowerCase) ? View.VISIBLE : View.GONE;
+                    findViewById(translation.getId()).setVisibility(visible);
                 }
 
                 return false;
@@ -108,106 +128,187 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initScrollLayout() {
+    private void initTranslations() {
 
-        LinearLayout scrollLayout = super.findViewById(R.id.scrollLayout);
-
-        List<String> tagNames = Arrays.asList(
-                "AndroidFP",
-                "Deitel",
-                "Google",
-                "iPhoneFP",
-                "JavaFP",
-                "JavaHTP",
-                "Facebook0",
-                "Facebook1",
-                "Facebook2",
-                "Facebook3"
-        );
-
-        tagNames.forEach(tagName -> scrollLayout.addView(createTag(tagName)));
+        LinearLayout translationsLayout = super.findViewById(R.id.translations);
+        translations.forEach(translation -> translationsLayout.addView(createTranslation(translation)));
     }
 
-    private LinearLayout createTag(String tagLabel) {
-
-        int tagId = View.generateViewId();
-        tags.add(new Tag(tagId, tagLabel));
-
-        LinearLayout.LayoutParams tagLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                DimensionConvertor.dpToPixel(DENSITY, 70)
-        );
-        tagLayoutParams.topMargin = DimensionConvertor.dpToPixel(DENSITY, 40);
-
-        LinearLayout tagLayout = new LinearLayout(this);
-        tagLayout.setId(tagId);
-        tagLayout.setLayoutParams(tagLayoutParams);
-        tagLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-
-        int buttonColor = ContextCompat.getColor(this, R.color.button_background);
-        int buttonTextColor = ContextCompat.getColor(this, R.color.black);
-
-        Button tagTextButton = new Button(this);
-        int labelWidth = DimensionConvertor.dpToPixel(DENSITY, 220);
-        int labelHeight = ViewGroup.LayoutParams.MATCH_PARENT;
-        LinearLayout.LayoutParams tagLabelButtonParams = new LinearLayout.LayoutParams(
-                labelWidth,
-                labelHeight
-        );
-
-        tagLabelButtonParams.setMarginStart(DimensionConvertor.dpToPixel(DENSITY, 20));
-        // set button colors
-        tagTextButton.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
-        tagTextButton.setTextColor(buttonTextColor);
-
-        tagTextButton.setLayoutParams(tagLabelButtonParams);
-        tagTextButton.setClickable(false);
-        tagTextButton.setAllCaps(false);
-        tagTextButton.setText(tagLabel);
-
-        tagLayout.addView(tagTextButton);
-
-        Button tagEditButton = new Button(this);
-        LinearLayout.LayoutParams tagEditButtonParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        tagEditButtonParams.setMarginStart(DimensionConvertor.dpToPixel(DENSITY, 10));
-        tagEditButtonParams.setMarginEnd(DimensionConvertor.dpToPixel(DENSITY, 20));
-
-        // set button colors
-        tagEditButton.setBackgroundTintList(ColorStateList.valueOf(buttonColor));
-        tagEditButton.setTextColor(buttonTextColor);
-
-        tagEditButton.setLayoutParams(tagEditButtonParams);
-        tagEditButton.setClickable(true);
-        tagEditButton.setText(R.string.edit);
-        tagEditButton.setAllCaps(false);
-        tagEditButton.setOnClickListener(view -> showDialog(tagTextButton));
-
-        tagLayout.addView(tagEditButton);
-
-        return tagLayout;
-    }
-
-    private void showDialog(Button tagTextButton) {
+    private void displayAddWordCallback() {
+        // Use AlertDialog suggested from Android
         Dialog dialog = new Dialog(this);
-        dialog.setTitle(R.string.edit_tag_text);
-        dialog.setCancelable(false);
-        dialog.setContentView(R.layout.dialog);
+        dialog.setContentView(R.layout.add_word_dialog);
 
-        EditText text = dialog.findViewById(R.id.edit_text_dialog);
-        text.setText(tagTextButton.getText());
-        Button dismissButton = dialog.findViewById(R.id.button7);
+        EditText firstWord = dialog.findViewById(R.id.edit_text_dialog1);
+        EditText secondWord = dialog.findViewById(R.id.edit_text_dialog2);
+
+        Button dismissButton = dialog.findViewById(R.id.addWordDismissButton);
         dismissButton.setOnClickListener(v -> dialog.dismiss());
-        Button confirmButton = dialog.findViewById(R.id.button6);
-        confirmButton.setOnClickListener(v -> {
-            tagTextButton.setText(text.getText());
+
+        Button addWordButton = dialog.findViewById(R.id.addWordButton);
+        addWordButton.setOnClickListener(v -> {
+            addNewTranslation(firstWord.getText().toString(), secondWord.getText().toString());
             dialog.dismiss();
         });
         dialog.show();
     }
 
+    private void addNewTranslation(String firstWord, String secondWord) {
+
+        if (firstWord.isEmpty() || secondWord.isEmpty()) {
+            return;
+        }
+
+        Translation translation = new Translation(firstWord, secondWord);
+        translations.add(0, translation);
+        LinearLayout translationsLayout = findViewById(R.id.translations);
+        translationsLayout.addView(createTranslation(translation), 1);
+        dictionaryService.updateDictionaryTranslations(translations);
+    }
+
+    private LinearLayout createTranslation(Translation translation) {
+
+        String translationForLanguage = translation.getTranslationForLanguage(language);
+        String inverseTranslationForLanguage = translation.getInverseTranslationForLanguage(language);
+
+        LinearLayout wordLayout = new LinearLayout(this);
+
+        LinearLayout.LayoutParams wordLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                DimensionConvertor.dpToPixel(80)
+        );
+
+        wordLayoutParams.topMargin = DimensionConvertor.dpToPixel(40);
+
+        wordLayout.setId(translation.getId());
+        wordLayout.setLayoutParams(wordLayoutParams);
+        wordLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        // Prepare colors
+
+        int whiteColor = ContextCompat.getColor(this, R.color.white);
+        int blackColor = ContextCompat.getColor(this, R.color.black);
+
+        // First Word Button
+        MaterialButton firstWordButton = new MaterialButton(this);
+
+        LinearLayout.LayoutParams firstButtonParams = new LinearLayout.LayoutParams(
+                DimensionConvertor.dpToPixel(130),
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        firstButtonParams.setMarginStart(DimensionConvertor.dpToPixel(5));
+        // set button colors
+        firstWordButton.setBackgroundTintList(ColorStateList.valueOf(whiteColor));
+        firstWordButton.setTextColor(blackColor);
+
+        firstWordButton.setLayoutParams(firstButtonParams);
+        firstWordButton.setClickable(false);
+        firstWordButton.setAllCaps(false);
+        firstWordButton.setText(translationForLanguage);
+
+        wordLayout.addView(firstWordButton);
+
+        // Second Word Button
+        MaterialButton secondWordButton = new MaterialButton(this);
+
+        LinearLayout.LayoutParams secondWordParams = new LinearLayout.LayoutParams(
+                DimensionConvertor.dpToPixel(130),
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        secondWordParams.setMarginStart(DimensionConvertor.dpToPixel(10));
+        secondWordParams.setMarginEnd(DimensionConvertor.dpToPixel(20));
+
+        secondWordButton.setLayoutParams(secondWordParams);
+        secondWordButton.setBackgroundTintList(ColorStateList.valueOf(whiteColor));
+        secondWordButton.setTextColor(blackColor);
+
+        secondWordButton.setClickable(false);
+        secondWordButton.setAllCaps(false);
+        secondWordButton.setText(inverseTranslationForLanguage);
+
+        wordLayout.addView(secondWordButton);
+
+        // Edit Button
+        ImageButton editButton = new ImageButton(this);
+
+        LinearLayout.LayoutParams editButtonParams = new LinearLayout.LayoutParams(
+                DimensionConvertor.dpToPixel(0),
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        editButtonParams.topMargin = DimensionConvertor.dpToPixel(6);
+        editButtonParams.setMarginEnd(DimensionConvertor.dpToPixel(10));
+        editButtonParams.bottomMargin = DimensionConvertor.dpToPixel(6);
+        editButtonParams.weight = 1;
+        editButton.setLayoutParams(editButtonParams);
+        editButton.setImageResource(android.R.drawable.ic_menu_edit);
+        editButton.setBackgroundColor(whiteColor);
+        editButton.setImageTintList(ColorStateList.valueOf(blackColor));
+        editButton.setOnClickListener(view -> displayDialogCallback(translation, firstWordButton, secondWordButton));
+        wordLayout.addView(editButton);
+
+        // Remove Button
+        ImageButton removeButton = new ImageButton(this);
+
+        LinearLayout.LayoutParams removeButtonParams = new LinearLayout.LayoutParams(
+                DimensionConvertor.dpToPixel(0),
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        removeButtonParams.topMargin = DimensionConvertor.dpToPixel(6);
+        removeButtonParams.setMarginEnd(DimensionConvertor.dpToPixel(5));
+        removeButtonParams.bottomMargin = DimensionConvertor.dpToPixel(6);
+        removeButtonParams.weight = 1;
+        removeButton.setLayoutParams(removeButtonParams);
+        removeButton.setImageResource(android.R.drawable.ic_delete);
+        removeButton.setBackgroundColor(whiteColor);
+        removeButton.setImageTintList(ColorStateList.valueOf(blackColor));
+        removeButton.setOnClickListener(view -> onRemoveWordTranslation(translation));
+
+        wordLayout.addView(removeButton);
+
+        return wordLayout;
+    }
+
+    private void displayDialogCallback(Translation translation, Button firstWord, Button secondWord) {
+        // Use AlertDialog suggested from Android
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.edit_word_dialog);
+
+        EditText text1 = dialog.findViewById(R.id.edit_text_dialog1);
+        text1.setText(translation.getEnglishWord());
+
+        EditText text2 = dialog.findViewById(R.id.edit_text_dialog2);
+        text2.setText(translation.getMacedonianWord());
+
+        Editable firstWordText = language == Language.ENGLISH ? text1.getText() : text2.getText();
+        Editable secondWordText = language == Language.ENGLISH ? text2.getText() : text1.getText();
+
+        // confirm and dismiss callbacks
+        Button confirmButton = dialog.findViewById(R.id.button6);
+        confirmButton.setOnClickListener(v -> {
+            firstWord.setText(firstWordText);
+            secondWord.setText(secondWordText);
+            translation.setEnglishWord(text1.getText().toString());
+            translation.setMacedonianWord(text2.getText().toString());
+
+            dictionaryService.updateDictionaryTranslations(translations);
+            dialog.dismiss();
+        });
+
+        Button dismissButton = dialog.findViewById(R.id.button7);
+        dismissButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void onRemoveWordTranslation(Translation translation) {
+        LinearLayout translationsLayout = findViewById(R.id.translations);
+        translationsLayout.removeView(findViewById(translation.getId()));
+        translations.remove(translation);
+        dictionaryService.updateDictionaryTranslations(translations);
+    }
 
 }

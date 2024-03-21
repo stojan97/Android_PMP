@@ -3,6 +3,10 @@
 ## Video
 https://github.com/stojan97/Android_PMP/assets/10180981/07970010-35de-49dc-a3c4-ffd1784f4c9e
 
+
+<br>
+<br>
+
 ## Functionality
 
 ![Android Prototype](attachments/Android%20PMP%20Prototype.png)

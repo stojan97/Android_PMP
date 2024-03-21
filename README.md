@@ -1,7 +1,7 @@
 # Android Project for PMP
 
 ## Video
-![Android Video](attachments/2024-03-21%2012-04-05.mp4)
+[Android Video](attachments/2024-03-21%2012-04-05.mp4)
 
 ## Functionality
 

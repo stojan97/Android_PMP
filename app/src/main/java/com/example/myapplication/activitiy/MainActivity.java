@@ -22,6 +22,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myapplication.R;
+import com.example.myapplication.dto.Language;
 import com.example.myapplication.dto.Translation;
 import com.example.myapplication.service.DictionaryService;
 import com.example.myapplication.service.impl.DictionaryServiceImpl;

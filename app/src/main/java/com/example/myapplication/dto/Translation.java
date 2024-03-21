@@ -2,8 +2,6 @@ package com.example.myapplication.dto;
 
 import android.view.View;
 
-import com.example.myapplication.activitiy.Language;
-
 /**
  * Translation DTO used for storing id and text of the Tags.
  */

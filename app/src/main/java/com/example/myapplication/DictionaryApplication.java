@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 public class DictionaryApplication extends Application {
 
     private static final String DICTIONARY_FILE_NAME = "dict.txt";
+
     @SuppressLint("StaticFieldLeak")
     private static Context context;
 

@@ -36,7 +36,7 @@ public class DictionaryApplication extends Application {
 
     private static void initDictionaryFile() {
         FileService fileService = new FileServiceImpl();
-        InputStream dictionaryInputStream = null;
+        InputStream dictionaryInputStream;
         try {
             dictionaryInputStream = context.getAssets().open(DICTIONARY_FILE_NAME);
         } catch (IOException e) {
@@ -54,15 +54,6 @@ public class DictionaryApplication extends Application {
     public static Path getDictionaryFilePath() {
         String internalStoragePath = context.getFilesDir().getPath();
         return Paths.get(internalStoragePath, DICTIONARY_FILE_NAME);
-    }
-
-    /**
-     * Gets the static Application context.
-     *
-     * @return the context
-     */
-    public static Context getContext() {
-        return context;
     }
 
     /**

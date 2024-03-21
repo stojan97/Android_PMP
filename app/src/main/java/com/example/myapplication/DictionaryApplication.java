@@ -52,7 +52,7 @@ public class DictionaryApplication extends Application {
      * @return the file path
      */
     public static Path getDictionaryFilePath() {
-        String internalStoragePath = getContext().getFilesDir().getPath();
+        String internalStoragePath = context.getFilesDir().getPath();
         return Paths.get(internalStoragePath, DICTIONARY_FILE_NAME);
     }
 
@@ -71,7 +71,7 @@ public class DictionaryApplication extends Application {
      * @return the density
      */
     public static float getApplicationDensity() {
-        return getContext().getResources().getDisplayMetrics().density;
+        return context.getResources().getDisplayMetrics().density;
     }
 
 }

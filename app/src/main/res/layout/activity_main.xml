@@ -106,62 +106,6 @@
                 android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold" />
-
-            <!-- Word Translation -->
-<!--            <LinearLayout-->
-<!--                android:id="@+id/linearLayoutExample"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="80dp"-->
-<!--                android:layout_marginTop="40dp"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/button3"-->
-<!--                    android:layout_width="130dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_marginStart="5dp"-->
-<!--                    android:backgroundTint="@color/white"-->
-<!--                    android:clickable="false"-->
-<!--                    android:text="English"-->
-<!--                    android:textAllCaps="false"-->
-<!--                    android:textColor="@color/black" />-->
-
-<!--                <Button-->
-<!--                    android:id="@+id/button4"-->
-<!--                    android:layout_width="130dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_marginStart="10dp"-->
-<!--                    android:layout_marginEnd="20dp"-->
-<!--                    android:backgroundTint="@color/white"-->
-<!--                    android:text="Macedonian"-->
-<!--                    android:textAllCaps="false"-->
-<!--                    android:textColor="@color/black" />-->
-
-<!--                <ImageButton-->
-<!--                    android:id="@+id/imageButton2"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_marginTop="6dp"-->
-<!--                    android:layout_marginEnd="10dp"-->
-<!--                    android:layout_marginBottom="6dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:background="@color/white"-->
-<!--                    app:srcCompat="@android:drawable/ic_menu_edit"-->
-<!--                    app:tint="@color/black" />-->
-
-<!--                <ImageButton-->
-<!--                    android:id="@+id/imageButton3"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_marginTop="6dp"-->
-<!--                    android:layout_marginEnd="5dp"-->
-<!--                    android:layout_marginBottom="6dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:background="@color/white"-->
-<!--                    app:srcCompat="@android:drawable/ic_delete"-->
-<!--                    app:tint="@color/black" />-->
-<!--            </LinearLayout>-->
-            <!-- Word Translation -->
         </LinearLayout>
     </ScrollView>
 
